@@ -38,16 +38,18 @@ export default function Dashboard() {
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">결제 지표 대시보드</h1>
-        <button
-          onClick={() => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.theme =
-              document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-          }}
-          className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded"
-        >
-          🌗 모드 전환
-        </button>
+        {typeof window !== 'undefined' && (
+          <button
+            onClick={() => {
+              document.documentElement.classList.toggle('dark');
+              localStorage.theme =
+                document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            }}
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded"
+          >
+            🌗 모드 전환
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
