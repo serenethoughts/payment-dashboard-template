@@ -1,133 +1,76 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>결제 대시보드</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .dark {
-      background-color: #1f2937;
-      color: #f9fafb;
-    }
-    .dark .card {
-      background-color: #374151;
-      color: #f9fafb;
-    }
-    .card {
-      background-color: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .positive-trend {
-      color: #10b981;
-    }
-    .negative-trend {
-      color: #ef4444;
-    }
-  </style>
-</head>
-<body class="bg-gray-100">
-  <div class="container mx-auto px-4 py-8">
-    <header class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-gray-800">결제 대시보드</h1>
-      <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 text-gray-800">
-        <i class="fas fa-moon"></i>
-      </button>
-    </header>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="card">
-        <div class="flex justify-between items-start">
-          <div>
-            <h3 class="text-sm font-medium text-gray-500">결제 성공률</h3>
-            <p id="payment-rate" class="text-2xl font-bold mt-1">94.7%</p>
-          </div>
-          <div class="p-2 bg-blue-100 rounded-lg">
-            <i class="fas fa-credit-card text-blue-600"></i>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center">
-          <i class="fas fa-arrow-up positive-trend mr-1"></i>
-          <span class="text-sm positive-trend">1.2%</span>
-          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
-        </div>
+// pages/index.js
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from 'recharts';
+
+const dummySequences = {
+  '결제 성공률': [92.1, 93.3, 94.0],
+  '인증 성공률': [89.5, 91.0, 88.8],
+  '수단별 이탈률': [12.3, 11.8, 13.2],
+  '디바이스별 성공률': [95.7, 96.4, 94.9],
+};
+
+const labels = Object.keys(dummySequences);
+
+export default function Dashboard() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % dummySequences[labels[0]].length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentData = labels.map((label) => ({
+    name: label,
+    value: dummySequences[label][index],
+  }));
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">결제 지표 대시보드</h1>
+        <button
+          onClick={() => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme =
+              document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+          }}
+          className="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded"
+        >
+          🌗 모드 전환
+        </button>
       </div>
 
-      <div class="card">
-        <div class="flex justify-between items-start">
-          <div>
-            <h3 class="text-sm font-medium text-gray-500">인증 성공률</h3>
-            <p id="auth-rate" class="text-2xl font-bold mt-1">97.2%</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        {currentData.map((metric) => (
+          <div key={metric.name} className="bg-gray-100 dark:bg-gray-800 p-4 rounded shadow">
+            <h2 className="text-lg font-semibold mb-2">{metric.name}</h2>
+            <p className="text-3xl">{metric.value}%</p>
           </div>
-          <div class="p-2 bg-green-100 rounded-lg">
-            <i class="fas fa-shield-alt text-green-600"></i>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center">
-          <i class="fas fa-arrow-up positive-trend mr-1"></i>
-          <span class="text-sm positive-trend">0.8%</span>
-          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
-        </div>
+        ))}
       </div>
 
-      <div class="card">
-        <div class="flex justify-between items-start">
-          <div>
-            <h3 class="text-sm font-medium text-gray-500">이탈률</h3>
-            <p id="churn-rate" class="text-2xl font-bold mt-1">3.5%</p>
-          </div>
-          <div class="p-2 bg-red-100 rounded-lg">
-            <i class="fas fa-chart-line text-red-600"></i>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center">
-          <i class="fas fa-arrow-down negative-trend mr-1"></i>
-          <span class="text-sm negative-trend">0.5%</span>
-          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="flex justify-between items-start">
-          <div>
-            <h3 class="text-sm font-medium text-gray-500">활성 사용자</h3>
-            <p id="active-users" class="text-2xl font-bold mt-1">8,700</p>
-          </div>
-          <div class="p-2 bg-purple-100 rounded-lg">
-            <i class="fas fa-users text-purple-600"></i>
-          </div>
-        </div>
-        <div class="mt-4 flex items-center">
-          <i class="fas fa-arrow-up positive-trend mr-1"></i>
-          <span class="text-sm positive-trend">2.4%</span>
-          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
-        </div>
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded shadow">
+        <h2 className="text-lg font-semibold mb-4">지표 요약 차트</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={currentData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <div class="card">
-        <h2 class="text-lg font-semibold mb-4">요일별 결제 현황</h2>
-        <div style="height: 300px;">
-          <canvas id="weekly-chart"></canvas>
-        </div>
-      </div>
-      
-      <div class="card">
-        <h2 class="text-lg font-semibold mb-4">시간대별 결제 금액</h2>
-        <div style="height: 300px;">
-          <canvas id="daily-chart"></canvas>
-        </div>
-      </div>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="card">
-        <h2 class="text-lg font-semibold mb-4">총 거래 건수</h2>
-        <p id="total-transactions" class="text-3xl font-bold">12,500건</p>
-        <div class="mt-4 text-sm text-gray-500">
+  );
+}
