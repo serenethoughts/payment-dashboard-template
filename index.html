@@ -5,14 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>결제 대시보드</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/recharts@2.7.2/umd/Recharts.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .dark {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
+    .dark .card {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .positive-trend {
+      color: #10b981;
+    }
+    .negative-trend {
+      color: #ef4444;
+    }
+  </style>
 </head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel" src="dashboard.js"></script>
-</body>
-</html>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <header class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-800">결제 대시보드</h1>
+      <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 text-gray-800">
+        <i class="fas fa-moon"></i>
+      </button>
+    </header>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="card">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">결제 성공률</h3>
+            <p id="payment-rate" class="text-2xl font-bold mt-1">94.7%</p>
+          </div>
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <i class="fas fa-credit-card text-blue-600"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <i class="fas fa-arrow-up positive-trend mr-1"></i>
+          <span class="text-sm positive-trend">1.2%</span>
+          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">인증 성공률</h3>
+            <p id="auth-rate" class="text-2xl font-bold mt-1">97.2%</p>
+          </div>
+          <div class="p-2 bg-green-100 rounded-lg">
+            <i class="fas fa-shield-alt text-green-600"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <i class="fas fa-arrow-up positive-trend mr-1"></i>
+          <span class="text-sm positive-trend">0.8%</span>
+          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">이탈률</h3>
+            <p id="churn-rate" class="text-2xl font-bold mt-1">3.5%</p>
+          </div>
+          <div class="p-2 bg-red-100 rounded-lg">
+            <i class="fas fa-chart-line text-red-600"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <i class="fas fa-arrow-down negative-trend mr-1"></i>
+          <span class="text-sm negative-trend">0.5%</span>
+          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">활성 사용자</h3>
+            <p id="active-users" class="text-2xl font-bold mt-1">8,700</p>
+          </div>
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <i class="fas fa-users text-purple-600"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <i class="fas fa-arrow-up positive-trend mr-1"></i>
+          <span class="text-sm positive-trend">2.4%</span>
+          <span class="text-xs text-gray-500 ml-2">지난 주 대비</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4">요일별 결제 현황</h2>
+        <div style="height: 300px;">
+          <canvas id="weekly-chart"></canvas>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4">시간대별 결제 금액</h2>
+        <div style="height: 300px;">
+          <canvas id="daily-chart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4">총 거래 건수</h2>
+        <p id="total-transactions" class="text-3xl font-bold">12,500건</p>
+        <div class="mt-4 text-sm text-gray-500">
